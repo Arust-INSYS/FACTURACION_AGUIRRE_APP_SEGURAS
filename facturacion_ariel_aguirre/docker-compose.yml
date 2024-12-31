@@ -1,0 +1,31 @@
+version: '3.8'
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: mysql-container
+    ports:
+      - "9898:3306" # Exponer el puerto 9898 del host para el contenedor MySQL
+    environment:
+      MYSQL_ROOT_PASSWORD: admin
+      MYSQL_DATABASE: facturacion_db
+    volumes:
+      - mysql-data:/var/lib/mysql # Persistencia de datos
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: facturacion-app
+    ports:
+      - "8080:8080" # Puerto para la aplicación Spring Boot
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/facturacion_db?useSSL=false&serverTimezone=UTC
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: admin
+    depends_on:
+      - mysql
+
+volumes:
+  mysql-data:
+    driver: local
+
